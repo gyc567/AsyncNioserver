@@ -27,6 +27,11 @@ public class LongEventMain
         Disruptor<LongEvent> disruptor =
                 new Disruptor<LongEvent>(factory, bufferSize, executor);
 
+//        Disruptor disruptor = new Disruptor(factory,
+//                bufferSize,
+//                ProducerType.SINGLE, // Single producer
+//                new BlockingWaitStrategy(),
+//                executor);
         // Connect the handler
         disruptor.handleEventsWith(new LongEventHandler());
 
