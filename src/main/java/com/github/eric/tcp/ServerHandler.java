@@ -34,7 +34,7 @@ public class ServerHandler implements Handler {
                 log.info("Server: data = " + new String(byteBuffer.array(), 0, readBytes));
                 String echo="I got u ,hello client!";
 
-                byteBuffer.flip();
+                //byteBuffer.flip();
                 ByteBuffer sendBuffer=ByteBuffer.wrap(echo.getBytes("UTF-8"));
                 socketChannel.write(sendBuffer);
                 break;
