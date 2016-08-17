@@ -36,7 +36,8 @@ public class ServerHandler implements Handler {
 
                 //byteBuffer.flip();
                 ByteBuffer sendBuffer=ByteBuffer.wrap(echo.getBytes("UTF-8"));
-                socketChannel.write(sendBuffer);
+                //socketChannel.write(sendBuffer);
+
                 break;
             }
         }

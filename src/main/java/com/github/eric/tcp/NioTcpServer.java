@@ -7,7 +7,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 /**
@@ -64,7 +63,7 @@ public class NioTcpServer implements Runnable {
 
 
     public static void main(String[] args) {
-        Executor executor = Executors.newCachedThreadPool();
+        Executor executor = ThreadPool.getInstance();
         NioTcpServer server = new NioTcpServer("localhost", 1000);
         executor.execute(server);
     }
