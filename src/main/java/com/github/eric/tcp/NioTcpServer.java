@@ -1,6 +1,12 @@
 package com.github.eric.tcp;
+
+import com.github.eric.*;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -18,8 +24,11 @@ public class NioTcpServer implements Runnable {
     private InetSocketAddress inetSocketAddress;
     private Handler handler = new ServerHandler();
 
+    private         Disruptor disruptor;
+
     public NioTcpServer(String hostname, int port) {
         inetSocketAddress = new InetSocketAddress(hostname, port);
+        initDisruptor();
     }
 
 
@@ -40,7 +49,9 @@ public class NioTcpServer implements Runnable {
                         SelectionKey key = it.next();
                         if(key.isAcceptable()) {
                             log.info("Server: SelectionKey is acceptable.");
-                            handler.handleAccept(key);
+                           handler.handleAccept(key);
+                           // publishEvent(NioTcpEventType.ACCEPT,key);
+
                         } else if(key.isReadable()) {
                             log.info("Server: SelectionKey is readable.");
                             handler.handleRead(key);
@@ -58,13 +69,55 @@ public class NioTcpServer implements Runnable {
         }
     }
 
+    public void publishEvent(NioTcpEventType nioTcpEventType,SelectionKey key)
+    {
+        // Get the ring buffer from the Disruptor to be used for publishing.
+        RingBuffer<NioTcpEvent> ringBuffer = disruptor.getRingBuffer();
+
+        NioTcpEventProducer producer = new NioTcpEventProducer(ringBuffer);
+
+        ByteBuffer bb = ByteBuffer.allocate(8);
+
+            //bb.putLong(0, 888);
+           //producer.onData(bb);
+            producer.onKey(nioTcpEventType,key);
 
 
+    }
+
+    public void initDisruptor()
+    {
+
+        // Executor that will be used to construct new threads for consumers
+        Executor disrutporExecutor = ThreadPool.getInstance().getExecutor();
+
+        // The factory for the event
+        NioTcpEventFactory factory = new NioTcpEventFactory();
+
+        // Specify the size of the ring buffer, must be power of 2.
+        int bufferSize = 1024;
+
+        // Construct the Disruptor
+        Disruptor<NioTcpEvent> disruptor =
+                new Disruptor<NioTcpEvent>(factory, bufferSize, disrutporExecutor);
 
 
-    public static void main(String[] args) {
-        Executor executor = ThreadPool.getInstance();
+        // Connect the handler
+        disruptor.handleEventsWith(new NioTcpEventHandler());
+
+        // Start the Disruptor, starts all threads running
+        disruptor.start();
+        this.disruptor=disruptor;
+
+    }
+
+
+    public static void main(String[] args) throws InterruptedException {
+        ThreadPool executor = ThreadPool.getInstance();
         NioTcpServer server = new NioTcpServer("localhost", 1000);
         executor.execute(server);
+
+
+
     }
 }

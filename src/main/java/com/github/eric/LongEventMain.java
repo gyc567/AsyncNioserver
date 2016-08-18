@@ -18,14 +18,14 @@ public class LongEventMain
         Executor executor = Executors.newCachedThreadPool();
 
         // The factory for the event
-        LongEventFactory factory = new LongEventFactory();
+        NioTcpEventFactory factory = new NioTcpEventFactory();
 
         // Specify the size of the ring buffer, must be power of 2.
         int bufferSize = 1024;
 
         // Construct the Disruptor
-        Disruptor<LongEvent> disruptor =
-                new Disruptor<LongEvent>(factory, bufferSize, executor);
+        Disruptor<NioTcpEvent> disruptor =
+                new Disruptor<NioTcpEvent>(factory, bufferSize, executor);
 
 //        Disruptor disruptor = new Disruptor(factory,
 //                bufferSize,
@@ -33,22 +33,22 @@ public class LongEventMain
 //                new BlockingWaitStrategy(),
 //                executor);
         // Connect the handler
-        disruptor.handleEventsWith(new LongEventHandler());
+        disruptor.handleEventsWith(new NioTcpEventHandler());
 
         // Start the Disruptor, starts all threads running
         disruptor.start();
 
         // Get the ring buffer from the Disruptor to be used for publishing.
-        RingBuffer<LongEvent> ringBuffer = disruptor.getRingBuffer();
+        RingBuffer<NioTcpEvent> ringBuffer = disruptor.getRingBuffer();
 
-        LongEventProducer producer = new LongEventProducer(ringBuffer);
+        NioTcpEventProducer producer = new NioTcpEventProducer(ringBuffer);
 
         ByteBuffer bb = ByteBuffer.allocate(8);
-        for (long l = 0; true; l++)
-        {
-            bb.putLong(0, l);
-            producer.onData(bb);
-            Thread.sleep(1000);
-        }
+//        for (long l = 0; true; l++)
+//        {
+//            bb.putLong(0, l);
+//            producer.onData(bb);
+//            Thread.sleep(1000);
+//        }
     }
 }

@@ -13,6 +13,10 @@ import java.util.logging.Logger;
 
 public class ServerHandler implements Handler {
     private static Logger log = Logger.getLogger(ServerHandler.class.getName());
+    public ServerHandler()
+    {
+
+    }
 
 
     public void handleAccept(SelectionKey key) throws IOException {
@@ -36,7 +40,8 @@ public class ServerHandler implements Handler {
 
                 //byteBuffer.flip();
                 ByteBuffer sendBuffer=ByteBuffer.wrap(echo.getBytes("UTF-8"));
-                //socketChannel.write(sendBuffer);
+                socketChannel.write(sendBuffer);
+
 
                 break;
             }
@@ -55,4 +60,6 @@ public class ServerHandler implements Handler {
         }
         byteBuffer.compact();
     }
+
+
 }
