@@ -18,8 +18,7 @@ public class NioTcpClient {
         inetSocketAddress = new InetSocketAddress(hostname, port);
     }
 
-    /**
-     * 发送请求数据
+    /*send request
      * @param requestData
      */
     public void send(String requestData) {

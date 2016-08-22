@@ -47,7 +47,7 @@ public class NioTcpEventMain
         NioTcpEventProducer producer = new NioTcpEventProducer(ringBuffer);
 
         ByteBuffer bb = ByteBuffer.allocate(8);
-        for (long l = 0; true; l++)
+        for (long l = 0; l<10; l++)
         {
             bb.putLong(0, l);
             producer.onKey(NioTcpEventType.READ, new SelectionKey() {
