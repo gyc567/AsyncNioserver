@@ -4,13 +4,16 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectableChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
  * Created by eric567 on 7/22/2016.
  */
-public class LongEventMain
+public class NioTcpEventMain
 {
     public static void main(String[] args) throws Exception
     {
@@ -44,11 +47,46 @@ public class LongEventMain
         NioTcpEventProducer producer = new NioTcpEventProducer(ringBuffer);
 
         ByteBuffer bb = ByteBuffer.allocate(8);
-//        for (long l = 0; true; l++)
-//        {
-//            bb.putLong(0, l);
-//            producer.onData(bb);
-//            Thread.sleep(1000);
-//        }
+        for (long l = 0; true; l++)
+        {
+            bb.putLong(0, l);
+            producer.onKey(NioTcpEventType.READ, new SelectionKey() {
+                @Override
+                public SelectableChannel channel() {
+                    return null;
+                }
+
+                @Override
+                public Selector selector() {
+                    return null;
+                }
+
+                @Override
+                public boolean isValid() {
+                    return false;
+                }
+
+                @Override
+                public void cancel() {
+
+                }
+
+                @Override
+                public int interestOps() {
+                    return 0;
+                }
+
+                @Override
+                public SelectionKey interestOps(int ops) {
+                    return null;
+                }
+
+                @Override
+                public int readyOps() {
+                    return 0;
+                }
+            });
+            Thread.sleep(1000);
+        }
     }
 }

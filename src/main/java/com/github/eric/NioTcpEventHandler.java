@@ -19,9 +19,21 @@ public class NioTcpEventHandler implements EventHandler<NioTcpEvent> {
         if (event.getNioTcpEventType().equals(NioTcpEventType.ACCEPT)) {
             onAccept(event);
         }
+        if (event.getNioTcpEventType().equals(NioTcpEventType.WRITE)) {
+            onWrite(event);
+        }
     }
 
     public  void onAccept(NioTcpEvent event) throws IOException {
+        SelectionKey key=event.getSelectionKey();
+        ServerSocketChannel serverSocketChannel = (ServerSocketChannel)key.channel();
+        SocketChannel socketChannel = serverSocketChannel.accept();
+        log.info("Server: accept client socket " + socketChannel);
+        socketChannel.configureBlocking(false);
+        socketChannel.register(key.selector(), SelectionKey.OP_READ);
+
+    }
+    public  void onWrite(NioTcpEvent event) throws IOException {
         SelectionKey key=event.getSelectionKey();
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel)key.channel();
         SocketChannel socketChannel = serverSocketChannel.accept();

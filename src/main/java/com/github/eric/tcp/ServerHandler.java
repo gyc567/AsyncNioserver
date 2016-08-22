@@ -4,6 +4,8 @@ package com.github.eric.tcp;
  * Created by eric567 on 8/13/2016.
  */
 
+import com.github.eric.NioTcpEventType;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
