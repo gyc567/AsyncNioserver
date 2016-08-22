@@ -59,7 +59,8 @@ public class NioTcpServer implements Runnable {
                         }
                         else if(key.isWritable()) {
                             log.info("Server: SelectionKey is writable.");
-                            handler.handleWrite(key);
+//                            handler.handleWrite(key);
+                            publishEvent(NioTcpEventType.WRITE,key);
                         }
                         it.remove();
                     }
