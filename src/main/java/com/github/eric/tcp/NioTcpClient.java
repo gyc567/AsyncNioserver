@@ -47,7 +47,7 @@ public class NioTcpClient {
     public static void main(String[] args) {
         String hostname = "localhost";
         String requestData = "Actions speak louder than words!";
-        int port = 1000;
+        int port = 3000;
         new NioTcpClient(hostname, port).send(requestData);
     }
 }
