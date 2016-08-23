@@ -1,8 +1,5 @@
 package com.github.eric.disruptor;
 
-/**
- * Created by eric567 on 8/23/2016.
- */
 
 import com.lmax.disruptor.*;
 import com.lmax.disruptor.TimeoutException;
@@ -17,8 +14,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.*;
 
+
 /**
- * @author Jon Brisbin <jon@jbrisbin.com>
+ * Created by eric567 on 8/23/2016.
  */
 public class TinyHttpServer {
 
@@ -108,6 +106,7 @@ public class TinyHttpServer {
 
         final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(false);
+
 
         Selector selector = Selector.open();
         serverSocketChannel.bind(new InetSocketAddress("127.0.0.1", 3000), 1024);
