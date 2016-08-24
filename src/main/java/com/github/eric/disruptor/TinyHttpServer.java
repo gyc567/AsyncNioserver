@@ -21,6 +21,9 @@ import java.util.concurrent.*;
 public class TinyHttpServer {
 
 
+    public static final String HOSTNAME = "127.0.0.1";
+    public static final int PORT = 3000;
+
     public static void main(String[] args) throws InterruptedException, IOException, AlertException, TimeoutException {
         final int cores = Runtime.getRuntime().availableProcessors();
         final int bufferSize = 4 * 1024;
@@ -60,7 +63,7 @@ public class TinyHttpServer {
     }
 
     private static void startServer(int bufferSize, Map<Long, SocketChannel> channels, Map<Long, SelectionKey> selectionKeys, RingBuffer<SelectionEvent> workerRing, ServerSocketChannel serverSocketChannel, Selector selector) throws IOException {
-        serverSocketChannel.bind(new InetSocketAddress("127.0.0.1", 3000), 1024);
+        serverSocketChannel.bind(new InetSocketAddress(HOSTNAME, PORT), 1024);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("server listen on :127.0.0.1:3000!------");
 
