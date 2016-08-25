@@ -1,6 +1,5 @@
 package com.github.eric.tcp;
 
-import com.github.eric.*;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 

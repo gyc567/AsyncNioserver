@@ -1,4 +1,4 @@
-package com.github.eric;
+package com.github.eric.tcp;
 
 import com.lmax.disruptor.EventFactory;
 
