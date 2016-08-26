@@ -1,21 +1,17 @@
 package com.github.eric.tcp;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created by eric567 on 8/18/2016.
  */
-public class ThreadPool  {
+public class ThreadPool {
 
-    private ThreadPoolExecutor threadPoolExecutor;
-    private static ThreadPool threadPool;
+    private static Executor threadPoolExecutor;
 
 
     private ThreadPool() {
-        threadPoolExecutor= new ThreadPoolExecutor(5, 10, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+
     }
 
 
@@ -32,13 +28,15 @@ public class ThreadPool  {
         static final ThreadPool instance = new ThreadPool();
     }
 
-    public void execute(Runnable command)
-    {
+    public void execute(Runnable command) {
         threadPoolExecutor.execute(command);
     }
 
-    public Executor getExecutor()
-    {
+    public static void newFixedThreadPool(int cores) {
+        threadPoolExecutor = Executors.newFixedThreadPool(cores);
+    }
+
+    public Executor getExecutor() {
         return threadPoolExecutor;
     }
 

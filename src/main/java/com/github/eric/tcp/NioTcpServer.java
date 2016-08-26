@@ -20,10 +20,16 @@ import java.util.logging.Logger;
 public class NioTcpServer implements Runnable {
 
     private static final Logger log = Logger.getLogger(NioTcpServer.class.getName());
+    public static final String LOCALHOST = "localhost";
+    public static final int PORT = 3000;
     private InetSocketAddress inetSocketAddress;
     private Handler handler = new ServerHandler();
 
-    private         Disruptor disruptor;
+    private Disruptor disruptor;
+    final static int cores = Runtime.getRuntime().availableProcessors();
+    final int bufferSize = 4 * 1024;
+    final int ringSize = 2048;
+
 
     public NioTcpServer(String hostname, int port) {
         inetSocketAddress = new InetSocketAddress(hostname, port);
@@ -33,33 +39,28 @@ public class NioTcpServer implements Runnable {
 
     public void run() {
         try {
-            Selector selector = Selector.open(); //
-            ServerSocketChannel serverSocketChannel = ServerSocketChannel.open(); //
-            serverSocketChannel.configureBlocking(false); //
-            serverSocketChannel.socket().bind(inetSocketAddress);
-            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT); //
+            Selector selector = initServerSocketAndSelector();
             log.info("Server: socket server started.");
-            while(true) { //
+            while (true) { //
                 int nKeys = selector.select();
-                if(nKeys>0) {
+                if (nKeys > 0) {
                     Set<SelectionKey> selectedKeys = selector.selectedKeys();
                     Iterator<SelectionKey> it = selectedKeys.iterator();
-                    while(it.hasNext()) {
+                    while (it.hasNext()) {
                         SelectionKey key = it.next();
-                        if(key.isAcceptable()) {
+                        if (key.isAcceptable()) {
                             log.info("Server: SelectionKey is acceptable.");
-                           handler.handleAccept(key);
-                           // publishEvent(NioTcpEventType.ACCEPT,key);
+                            handler.handleAccept(key);
+                            // publishEvent(NioTcpEventType.ACCEPT,key);
 
-                        } else if(key.isReadable()) {
+                        } else if (key.isReadable()) {
                             log.info("Server: SelectionKey is readable.");
-                       //     handler.handleRead(key);
-                            publishEvent(NioTcpEventType.READ,key);
-                        }
-                        else if(key.isWritable()) {
+                            //     handler.handleRead(key);
+                            publishEvent(NioTcpEventType.READ, key);
+                        } else if (key.isWritable()) {
                             log.info("Server: SelectionKey is writable.");
 //                            handler.handleWrite(key);
-                            publishEvent(NioTcpEventType.WRITE,key);
+                            publishEvent(NioTcpEventType.WRITE, key);
                         }
                         it.remove();
                     }
@@ -70,8 +71,16 @@ public class NioTcpServer implements Runnable {
         }
     }
 
-    public void publishEvent(NioTcpEventType nioTcpEventType,SelectionKey key)
-    {
+    private Selector initServerSocketAndSelector() throws IOException {
+        Selector selector = Selector.open(); //
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open(); //
+        serverSocketChannel.configureBlocking(false); //
+        serverSocketChannel.socket().bind(inetSocketAddress);
+        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT); //
+        return selector;
+    }
+
+    public void publishEvent(NioTcpEventType nioTcpEventType, SelectionKey key) {
         // Get the ring buffer from the Disruptor to be used for publishing.
         RingBuffer<NioTcpEvent> ringBuffer = disruptor.getRingBuffer();
 
@@ -79,15 +88,12 @@ public class NioTcpServer implements Runnable {
 
         ByteBuffer bb = ByteBuffer.allocate(8);
 
-            //bb.putLong(0, 888);
-           //producer.onData(bb);
-            producer.onKey(nioTcpEventType,key);
+        producer.onKey(nioTcpEventType, key);
 
 
     }
 
-    public void initDisruptor()
-    {
+    public void initDisruptor() {
 
         // Executor that will be used to construct new threads for consumers
         Executor disrutporExecutor = ThreadPool.getInstance().getExecutor();
@@ -108,16 +114,17 @@ public class NioTcpServer implements Runnable {
 
         // Start the Disruptor, starts all threads running
         disruptor.start();
-        this.disruptor=disruptor;
+        this.disruptor = disruptor;
 
     }
 
 
     public static void main(String[] args) throws InterruptedException {
         ThreadPool executor = ThreadPool.getInstance();
-        NioTcpServer server = new NioTcpServer("localhost", 1000);
-        executor.execute(server);
+        executor.newFixedThreadPool(cores);
 
+        NioTcpServer server = new NioTcpServer(LOCALHOST, PORT);
+        executor.execute(server);
 
 
     }
