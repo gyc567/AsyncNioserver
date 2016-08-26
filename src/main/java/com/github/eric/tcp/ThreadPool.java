@@ -33,6 +33,8 @@ public class ThreadPool {
     }
 
     public static void newFixedThreadPool(int cores) {
+        System.out.println("cpu cores is " + cores);
+
         threadPoolExecutor = Executors.newFixedThreadPool(cores);
     }
 

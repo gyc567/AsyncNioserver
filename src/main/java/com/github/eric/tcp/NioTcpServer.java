@@ -27,8 +27,8 @@ public class NioTcpServer implements Runnable {
 
     private Disruptor disruptor;
     final static int cores = Runtime.getRuntime().availableProcessors();
-    final int bufferSize = 4 * 1024;
-    final int ringSize = 2048;
+    final static int bufferSize = 4 * 1024;
+    final static  int ringSize = 2048;
 
 
     public NioTcpServer(String hostname, int port) {
