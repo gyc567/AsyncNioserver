@@ -168,7 +168,9 @@ public class TinyHttpServer {
         };
     }
 
-    private static long handleRead(Map<Long, SocketChannel> channels, Map<Long, SelectionKey> selectionKeys, RingBuffer<SelectionEvent> workerRing, long workerId, SelectionKey key) {
+    private static long handleRead(Map<Long, SocketChannel> channels,
+                                   Map<Long, SelectionKey> selectionKeys,
+                                   RingBuffer<SelectionEvent> workerRing, long workerId, SelectionKey key) {
         SelectionEvent event;// Allocate an Event object for dispatching to the handler
         event = workerRing.get(workerId);
         event.id = workerId;
@@ -181,7 +183,9 @@ public class TinyHttpServer {
         return workerId;
     }
 
-    private static long handleAccept(int bufferSize, Map<Long, SocketChannel> channels, Map<Long, SelectionKey> selectionKeys, RingBuffer<SelectionEvent> workerRing, ServerSocketChannel serverSocketChannel, Selector selector, long workerId) throws IOException {
+    private static long handleAccept(int bufferSize, Map<Long, SocketChannel> channels,
+                                     Map<Long, SelectionKey> selectionKeys, RingBuffer<SelectionEvent> workerRing,
+                                     ServerSocketChannel serverSocketChannel, Selector selector, long workerId) throws IOException {
         SelectionEvent event;ServerSocket serverSocket = serverSocketChannel.socket();
         serverSocket.setReceiveBufferSize(bufferSize);
         serverSocket.setReuseAddress(true);
