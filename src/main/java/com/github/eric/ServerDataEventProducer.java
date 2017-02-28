@@ -32,12 +32,7 @@ public class ServerDataEventProducer {
 
 
     public void processData(TinyNIOServer server, SocketChannel socket, byte[] data, int count) {
-//        byte[] dataCopy = new byte[count];
-//        System.arraycopy(data, 0, dataCopy, 0, count);
-//        synchronized(queue) {
-//            queue.add(new ServerDataEvent(server, socket, dataCopy));
-//            queue.notify();
-//        }
+
         long sequence = ringBuffer.next();  // Grab the next sequence
         try {
             ServerDataEvent event = ringBuffer.get(sequence); // Get the entry in the Disruptor

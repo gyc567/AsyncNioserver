@@ -73,11 +73,13 @@ public class TinyNIOServer implements Runnable {
 		while (true) {
 			try {
 				this.selector.select();
+
 				Iterator<SelectionKey> selectionKeys = this.selector
 						.selectedKeys().iterator();
 				while (selectionKeys.hasNext()) {
 					SelectionKey key = selectionKeys.next();
 					selectionKeys.remove();
+
 					if (key.isValid()) {
 						break;
 					}

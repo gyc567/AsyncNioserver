@@ -7,7 +7,6 @@ import com.lmax.disruptor.TimeoutException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
@@ -62,7 +61,8 @@ public class TinyHttpServer {
         return bufferPool;
     }
 
-    private static void startServer(int bufferSize, Map<Long, SocketChannel> channels, Map<Long, SelectionKey> selectionKeys, RingBuffer<SelectionEvent> workerRing, ServerSocketChannel serverSocketChannel, Selector selector) throws IOException {
+    private static void startServer(int bufferSize, Map<Long, SocketChannel> channels, Map<Long, SelectionKey> selectionKeys,
+                                    RingBuffer<SelectionEvent> workerRing, ServerSocketChannel serverSocketChannel, Selector selector) throws IOException {
         serverSocketChannel.bind(new InetSocketAddress(HOSTNAME, PORT), 1024);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("server listen on :127.0.0.1:3000!------");
@@ -71,13 +71,17 @@ public class TinyHttpServer {
         allocateJobToWorker(bufferSize, channels, selectionKeys, workerRing, serverSocketChannel, selector);
     }
 
-    private static void allocateJobToWorker(int bufferSize, Map<Long, SocketChannel> channels, Map<Long, SelectionKey> selectionKeys, RingBuffer<SelectionEvent> workerRing, ServerSocketChannel serverSocketChannel, Selector selector) throws IOException {
+    private static void allocateJobToWorker(int bufferSize, Map<Long, SocketChannel> channels, Map<Long, SelectionKey>
+            selectionKeys, RingBuffer<SelectionEvent> workerRing, ServerSocketChannel serverSocketChannel, Selector selector) throws IOException {
         long workerId = workerRing.next();
         while (true) {
             int cnt = 0;
             try {
+
                 cnt = selector.select();
-            } catch (CancelledKeyException e) {}
+
+            } catch (CancelledKeyException e) {e.printStackTrace();}
+
             if (cnt > 0) {
                 Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
@@ -115,7 +119,8 @@ public class TinyHttpServer {
                 handlers);
     }
 
-    private static void buildWorkHandler(final BlockingDeque<ByteBuffer> bufferPool, final Map<Long, SocketChannel> channels, final Map<Long, SelectionKey> selectionKeys, WorkHandler<SelectionEvent>[] handlers, final Sequence[] sequences, int i) {
+    private static void buildWorkHandler(final BlockingDeque<ByteBuffer> bufferPool, final Map<Long, SocketChannel> channels,
+                                         final Map<Long, SelectionKey> selectionKeys, WorkHandler<SelectionEvent>[] handlers, final Sequence[] sequences, int i) {
         final int handlerId = i;
         handlers[i] = new WorkHandler<SelectionEvent>() {
 
@@ -195,10 +200,10 @@ public class TinyHttpServer {
             SocketChannel channel = serverSocketChannel.accept();
             if (null != channel) {
                 channel.configureBlocking(false);
-                channel.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
-                channel.setOption(StandardSocketOptions.TCP_NODELAY, true);
-                channel.setOption(StandardSocketOptions.SO_RCVBUF, bufferSize);
-                channel.setOption(StandardSocketOptions.SO_SNDBUF, bufferSize);
+//                channel.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
+//                channel.setOption(StandardSocketOptions.TCP_NODELAY, true);
+//                channel.setOption(StandardSocketOptions.SO_RCVBUF, bufferSize);
+//                channel.setOption(StandardSocketOptions.SO_SNDBUF, bufferSize);
                 SelectionKey readKey = channel.register(selector, SelectionKey.OP_READ);
 
                 // Allocate an Event object for dispatching to the handler
